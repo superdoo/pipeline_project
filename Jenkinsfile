@@ -14,6 +14,17 @@ pipeline {
                 git 'https://github.com/superdoo/pipeline_project.git'
             }
         }
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('AWS Setup') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                    sh 'aws sts get-caller-identity'
+                }
+            }
 
     stage('Check AWS Credentials') {
         steps {
