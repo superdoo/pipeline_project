@@ -25,6 +25,7 @@ pipeline {
                     sh 'aws sts get-caller-identity'
                 }
             }
+        }
         stage('AWS Setuptest') {
             steps {
                 script {
