@@ -1,7 +1,6 @@
 import boto3
 import json
 import os
-sh 'python3 query_customer.py'
 
 def upload_to_s3():
     # Get the AWS credentials from environment variables (set in Jenkins)
