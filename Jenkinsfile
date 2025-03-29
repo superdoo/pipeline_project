@@ -1,7 +1,7 @@
 import boto3
 import json
 import os
-from query_customer import fetch_customers
+sh 'python3 query_customer.py'
 
 def upload_to_s3():
     aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
