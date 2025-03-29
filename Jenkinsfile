@@ -1,36 +1,29 @@
-pipeline {
-    agent any
+import boto3
+import json
+import os
+from query_customer import fetch_customers
 
-    environment {
-        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
-    }
+def upload_to_s3():
+    # Get the AWS credentials from environment variables (set in Jenkins)
+    aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
+    aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+    
+    # Initialize boto3 client using the credentials from environment variables
+    s3_client = boto3.client(
+        's3', 
+        aws_access_key_id=aws_access_key_id, 
+        aws_secret_access_key=aws_secret_access_key
+    )
+    
+    data = fetch_customers()
+    json_data = json.dumps(data)
 
-    stages {
-        stage('Checkout Code') {
-            steps {
-                git 'https://github.com/superdoo/pipeline_project.git'  // Replace with your GitHub repo
-            }
-        }
-        
-        stage('Setup Python Environment') {
-            steps {
-                script {
-                    // Create virtual environment and install dependencies
-                    sh 'python -m venv venv'
-                    sh './venv/bin/pip install -r requirements.txt'
-                }
-            }
-        }
+    # Upload to S3
+    s3_client.put_object(
+        Bucket='reportsgraphs',
+        Key='customer_data.json',
+        Body=json_data
+    )
 
-        stage('Run Python Script') {
-            steps {
-                script {
-                    // Run your Python code to query DB and upload to S3
-                    sh './venv/bin/python query_customer.py'
-                    sh './venv/bin/python upload_to_s3.py'
-                }
-            }
-        }
-    }
-}
+if __name__ == "__main__":
+    upload_to_s3()
