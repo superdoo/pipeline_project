@@ -19,14 +19,14 @@ pipeline {
                 checkout scm
             }
         }
-        stage('AWS Setup') {
-            steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
-                    sh 'aws sts get-caller-identity'
-                }
+
+    stage('AWS CLI Version') {
+        steps {
+            sh 'aws --version'  // Ensure AWS CLI is available
             }
         }
-        stage('AWS Setuptest') {
+
+    stage('AWS Setuptest') { //supposed to echo creds and check caller id
             steps {
                 script {
                     echo "AWS_ACCESS_KEY_ID: ${env.AWS_ACCESS_KEY_ID}"
