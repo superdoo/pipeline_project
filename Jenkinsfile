@@ -25,6 +25,14 @@ pipeline {
                     sh 'aws sts get-caller-identity'
                 }
             }
+        stage('AWS Setuptest') {
+            steps {
+                script {
+                    echo "AWS_ACCESS_KEY_ID: ${env.AWS_ACCESS_KEY_ID}"
+                    echo "AWS_SECRET_ACCESS_KEY: ${env.AWS_SECRET_ACCESS_KEY}"
+                    sh 'aws sts get-caller-identity'
+                }
+            }
         }
 
     stage('Check AWS Credentials') {
