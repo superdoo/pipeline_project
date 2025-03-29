@@ -25,6 +25,7 @@ pipeline {
                     sh 'aws sts get-caller-identity'
                 }
             }
+        }
 
     stage('Check AWS Credentials') {
         steps {
@@ -51,4 +52,4 @@ pipeline {
         }
     }
 }
-}
+
