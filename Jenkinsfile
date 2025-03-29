@@ -1,30 +1,32 @@
-import boto3
-import json
-import os
-from query_customer import fetch_customers
+pipeline {
+    agent any
 
-def upload_to_s3():
-    aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
-    aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
-    
-    s3_client = boto3.client(
-        's3', 
-        aws_access_key_id=aws_access_key_id, 
-        aws_secret_access_key=aws_secret_access_key
-    )
-    
-    data = fetch_customers()
-    json_data = json.dumps(data)
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+    }
 
-    with open("customer_data.json", "w") as f:
-        f.write(json_data)
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/superdoo/pipeline_project.git'
+            }
+        }
 
-    # Upload to S3
-    s3_client.put_object(
-        Bucket='reportsgraphs',
-        Key='customer_data.json',
-        Body=json_data
-    )
+        stage('Run Python Script with Parameter') {
+            steps {
+                script {
+                    sh "python3 script.py Michael"
+                }
+            }
+        }
 
-if __name__ == "__main__":
-    upload_to_s3()
+        stage('Upload to S3') {
+            steps {
+                script {
+                    sh "python3 upload_to_s3.py"
+                }
+            }
+        }
+    }
+}
