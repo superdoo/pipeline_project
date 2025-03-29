@@ -14,7 +14,7 @@ pipeline {
                 git 'https://github.com/superdoo/pipeline_project.git'
             }
         }
-        
+
     stage('Check AWS Credentials') {
         steps {
             script {
@@ -23,16 +23,7 @@ pipeline {
             }
         }
 
-        stage('Check AWS Credentials') {
-            steps {
-                script {
-                    echo "AWS_ACCESS_KEY_ID is: ${AWS_ACCESS_KEY_ID}"
-                    // Do NOT print AWS_SECRET_ACCESS_KEY to avoid exposing it
-                }
-            }
-        }
-
-        stage('Run Python Script with Parameter') {
+    stage('Run Python Script with Parameter') {
             steps {
                 script {
                     sh "python3 script.py Michael"
