@@ -6,18 +6,20 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
     }
 
-    stage('Check AWS Credentials') {
-        steps {
-            script {
-                sh 'env | grep AWS'  // This will check if the AWS env vars are set
-                }
-            }
-        }
+
 
     stages {
         stage('Checkout Code') {
             steps {
                 git 'https://github.com/superdoo/pipeline_project.git'
+            }
+        }
+        
+    stage('Check AWS Credentials') {
+        steps {
+            script {
+                sh 'env | grep AWS'  // This will check if the AWS env vars are set
+                }
             }
         }
 
