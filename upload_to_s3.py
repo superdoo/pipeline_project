@@ -1,23 +1,10 @@
-import boto3
-import json
-import os
+from database import fetch_customers  # Ensure this matches the correct file name
 
 def upload_to_s3():
-    # Get the AWS credentials from environment variables (set in Jenkins)
-    aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
-    aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
-    
-    # Initialize boto3 client using the credentials from environment variables
-    s3_client = boto3.client(
-        's3', 
-        aws_access_key_id=aws_access_key_id, 
-        aws_secret_access_key=aws_secret_access_key
-    )
-    
-    data = fetch_customers()
-    json_data = json.dumps(data)
-
-    # Upload to S3
+    data = fetch_customers()  # This should now work
+    print("Uploading data:", data)
+    # Add S3 upload logic here
+        # Upload to S3
     s3_client.put_object(
         Bucket='reportsgraphs',
         Key='customer_data.json',
