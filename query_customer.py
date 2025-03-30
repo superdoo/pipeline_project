@@ -79,7 +79,7 @@ def main():
     plot_filename = plot_genre_distribution(df)
 
     # Define your S3 bucket name
-    bucket_name = 'your-s3-bucket-name'
+    bucket_name = 'reportsgraphs'
 
     # Upload the plot to S3
     upload_to_s3(plot_filename, bucket_name)
