@@ -6,6 +6,12 @@ pipeline {
     }
 
     stages {
+
+             stage('Install Dependencies') {
+            steps {
+                sh 'pip3 install --user boto3'
+            }
+             }
         stage('Checkout Code') {
             steps {
               git branch: 'main', url: 'https://github.com/superdoo/pipeline_project.git'
