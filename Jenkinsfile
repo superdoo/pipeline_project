@@ -26,7 +26,7 @@ pipeline {
         stage('Query Customer Data') {
             steps {
                 sh '''
-                source $VENV_PATH/bin/activate
+                $VENV_PATH/bin/activate
                 python3 query_customer.py
                 '''
             }
