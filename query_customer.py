@@ -9,7 +9,7 @@ from db_connect import get_db_connection
 BUCKET_NAME = "reportsgraphs"  # Replace with your bucket name
 
 def fetch_album_data():
-    """Fetch album data from the database and save it as a CSV file."""
+    """Fetch album data from the database and save it as a properly formatted CSV file."""
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -28,9 +28,12 @@ def fetch_album_data():
     # Convert to DataFrame
     df = pd.DataFrame(result, columns=columns)
 
-    # Save to CSV
+    # Ensure proper data formatting
+    df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)  # Remove extra spaces in text columns
+
+    # Save to CSV with proper encoding and format
     csv_filename = "album_data.csv"
-    df.to_csv(csv_filename, index=False)
+    df.to_csv(csv_filename, index=False, encoding="utf-8", sep=",", quoting=1)  # Ensure clean formatting
     
     cursor.close()
     conn.close()
