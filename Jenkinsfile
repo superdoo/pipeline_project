@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/superdoo/pipeline_project.git'
+              git branch: 'main', url: 'https://github.com/superdoo/pipeline_project.git'
             }
         }
 
