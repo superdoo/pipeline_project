@@ -13,8 +13,8 @@ def upload_to_s3():
     csv_data = data.to_csv(index=False)
     
     # Define S3 bucket and object name
-    bucket_name = 'reportsgraphs'
-    object_name = 'resultset.csv'
+    bucket_name = 'your-bucket-name'
+    object_name = 'your-object-name.csv'
     
     # Upload the CSV data to S3
     s3_client.put_object(
