@@ -6,7 +6,7 @@ from io import BytesIO
 from db_connect import get_db_connection
 
 # S3 Configuration
-BUCKET_NAME = "your-s3-bucket-name"  # Replace with your bucket name
+BUCKET_NAME = "reportsgraphs"  # Replace with your bucket name
 
 def fetch_album_data():
     """Fetch album data from the database and save it as a CSV file."""
