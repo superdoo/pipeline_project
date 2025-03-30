@@ -2,8 +2,12 @@ pipeline {
     agent any
 
     environment {
-        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+                         // Use Jenkins credentials for AWS access keys
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'my-aws-credentials-id']]) {
+                        // Configure AWS CLI with the credentials
+                        sh 'aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}'
+                        sh 'aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}'
+                        sh 'aws configure set region ${AWS_REGION}'
     }
 
 
@@ -35,23 +39,6 @@ pipeline {
                 }
             }
         }
-
-    stage('Check AWS Credentials') {
-        steps {
-            script {
-                sh 'env | grep AWS'  // This will check if the AWS env vars are set
-                }
-            }
-        }
-
-    stage('Run Python Script with Parameter') {
-            steps {
-                script {
-                    sh "python3 script.py Michael"
-                }
-            }
-        }
-
         stage('Upload to S3') {
             steps {
                 script {

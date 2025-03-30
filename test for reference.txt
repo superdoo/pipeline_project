@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION = 'us-east-1'  // Specify your AWS region
+        S3_BUCKET = 'reportsgraphs'  // Replace with your S3 bucket name
+        LOCAL_DIRECTORY = '/test'  // Replace with the directory of files you want to move
+    }
+
+    stages {
+        stage('Move Files to S3') {
+            steps {
+                script {
+                    // Install AWS CLI if not already installed (without using sudo)
+                    //sh '''
+                    //curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                    //unzip awscliv2.zip
+                   // sudo ./aws/install
+                   // '''
+
+                    // Use Jenkins credentials for AWS access keys
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'my-aws-credentials-id']]) {
+                        // Configure AWS CLI with the credentials
+                        sh 'aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}'
+                        sh 'aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}'
+                        sh 'aws configure set region ${AWS_REGION}'
+
+                        // Upload files to the S3 bucket
+                        sh 'whoami'
+                        sh 'aws s3 cp ${LOCAL_DIRECTORY} s3://${S3_BUCKET}/ --recursive'
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Files successfully moved to S3."
+        }
+        failure {
+            echo "Failed to move files to S3."
+        }
+    }
+}
