@@ -7,11 +7,15 @@ pipeline {
 
     stages {
 
-             stage('Install Dependencies') {
+           stage('Setup Virtual Environment') {
             steps {
-                sh 'pip3 install --user boto3'
+                sh '''
+                python3 -m venv venv
+                source venv/bin/activate
+                pip install boto3
+                '''
             }
-             }
+        }
         stage('Checkout Code') {
             steps {
               git branch: 'main', url: 'https://github.com/superdoo/pipeline_project.git'
