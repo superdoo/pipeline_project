@@ -2,79 +2,86 @@ import psycopg2
 import pandas as pd
 import matplotlib.pyplot as plt
 import boto3
-from io import BytesIO
 from db_connect import get_db_connection
 
-# S3 Configuration
-BUCKET_NAME = "reportsgraphs"  # Replace with your bucket name
-
-def fetch_album_data():
-    """Fetch album data from the database and save it as a properly formatted CSV file."""
+def fetch_album_genre_data():
+    """
+    Fetch artist, album, and genre data from the database.
+    """
+    # Open a connection to the database
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    query = """
-    SELECT al.*
-    FROM artists a
-    JOIN albums al ON a.artist_id = al.artist_id;
-    """
-    
-    cursor.execute(query)
+    # Execute the query to fetch artist name, album name, and genre
+    cursor.execute("""
+        SELECT a.artist_name, al.album_name, al.genre
+        FROM artists a
+        JOIN albums al ON a.artist_id = al.artist_id;
+    """)
+
+    # Fetch the results
     result = cursor.fetchall()
-    
-    # Get column names
-    columns = [desc[0] for desc in cursor.description]
-
-    # Convert to DataFrame
-    df = pd.DataFrame(result, columns=columns)
-
-    # Ensure proper data formatting
-    df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)  # Remove extra spaces in text columns
-
-    # Save to CSV with proper encoding and format
-    csv_filename = "album_data.csv"
-    df.to_csv(csv_filename, index=False, encoding="utf-8", sep=",", quoting=1)  # Ensure clean formatting
-    
     cursor.close()
     conn.close()
 
-    print(f"CSV file saved: {csv_filename}")
-    return csv_filename, df
+    # Convert the result into a pandas DataFrame
+    df = pd.DataFrame(result, columns=["Artist", "Album", "Genre"])
+    return df
 
-def create_graph(df):
-    """Generate a bar chart showing album counts per artist."""
-    album_counts = df["artist_id"].value_counts()
+def plot_genre_distribution(df):
+    """
+    Plot the distribution of albums by genre and save the plot as an image.
+    """
+    # Count the number of albums per genre
+    genre_counts = df["Genre"].value_counts()
 
-    plt.figure(figsize=(10, 5))
-    album_counts.plot(kind="bar", color="skyblue")
-    plt.xlabel("Artist ID")
+    # Plot the distribution of genres
+    plt.figure(figsize=(10, 6))
+    genre_counts.plot(kind='bar', color='skyblue')
+    plt.title("Album Distribution by Genre")
+    plt.xlabel("Genre")
     plt.ylabel("Number of Albums")
-    plt.title("Albums per Artist")
     plt.xticks(rotation=45)
+    plt.tight_layout()
 
-    graph_filename = "album_graph.png"
-    plt.savefig(graph_filename)
+    # Save the plot as an image
+    plot_filename = 'album_genre_distribution.png'
+    plt.savefig(plot_filename)
     plt.close()
 
-    print(f"Graph saved: {graph_filename}")
-    return graph_filename
+    return plot_filename
 
-def upload_to_s3(file_name, bucket, object_name=None):
-    """Upload a file to an S3 bucket."""
-    s3_client = boto3.client("s3")
+def upload_to_s3(file_name, bucket_name, object_name=None):
+    """
+    Upload a file to an S3 bucket.
+    """
+    # If no object name is provided, use the file name
     if object_name is None:
         object_name = file_name
 
+    # Upload the file to S3
+    s3_client = boto3.client('s3')
     try:
-        s3_client.upload_file(file_name, bucket, object_name)
-        print(f"Uploaded {file_name} to S3 bucket {bucket} as {object_name}")
+        s3_client.upload_file(file_name, bucket_name, object_name)
+        print(f"File {file_name} uploaded to S3 bucket {bucket_name} as {object_name}.")
     except Exception as e:
-        print(f"Error uploading {file_name} to S3: {e}")
+        print(f"Error uploading file to S3: {e}")
+
+def main():
+    """
+    Main function to fetch data, generate the plot, and upload the plot to S3.
+    """
+    # Fetch the album genre data
+    df = fetch_album_genre_data()
+
+    # Plot the genre distribution graph
+    plot_filename = plot_genre_distribution(df)
+
+    # Define your S3 bucket name
+    bucket_name = 'your-s3-bucket-name'
+
+    # Upload the plot to S3
+    upload_to_s3(plot_filename, bucket_name)
 
 if __name__ == "__main__":
-    csv_file, df = fetch_album_data()
-    graph_file = create_graph(df)
-
-    # Upload files to S3
-    upload_to_s3(csv_file, BUCKET_NAME)
-    upload_to_s3(graph_file, BUCKET_NAME)
+    main()
