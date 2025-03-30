@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        VENV_PATH = 'venv'
+        VENV_PATH = '. venv'
         BUCKET_NAME = 'reportsgraphs'
     }
 
@@ -17,7 +17,7 @@ pipeline {
             steps {
             sh '''
             python3 -m venv $VENV_PATH
-            . $VENV_PATH/bin/activate  # Use "." instead of "source"
+            $VENV_PATH/bin/activate  # Use "." instead of "source"
             pip install -r requirements.txt
             '''
             }
