@@ -14,9 +14,10 @@ def fetch_album_genre_data():
 
     # Execute the query to fetch artist name, album name, and genre
     cursor.execute("""
-        SELECT a.artist_name, al.album_name, al.genre
+        SELECT a.name, al.title, ag.name
         FROM artists a
-        JOIN albums al ON a.artist_id = al.artist_id;
+        JOIN albums al ON a.artist_id = al.artist_id
+        JOIN genres ag on ag.genre_id = al.genre_id; 
     """)
 
     # Fetch the results
