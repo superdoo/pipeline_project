@@ -31,6 +31,14 @@ pipeline {
                 '''
             }
         }
+                stage('Upload to S3') {
+            steps {
+                sh '''
+                . venv/bin/activate
+                python3 upload_to_s3.py
+                '''
+            }
+        }
     }
 
     post {
